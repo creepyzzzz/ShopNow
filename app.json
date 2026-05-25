@@ -1,25 +1,79 @@
 {
   "expo": {
     "name": "ShopNow",
-    "slug": "ShopNow",
+    "slug": "shopnow-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "ios": {
-      "supportsTablet": true
+    "newArchEnabled": true,
+    "scheme": "shopnow",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "monochromeImage": "./assets/android-icon-monochrome.png",
+        "backgroundColor": "#ffffff"
       },
-      "predictiveBackGestureEnabled": false
+      "package": "com.shopnow.deals",
+      "permissions": [
+        "android.permission.NOTIFICATIONS",
+        "android.permission.VIBRATE",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.CAMERA",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow ShopNow to use Face ID"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#FF6B35",
+          "sounds": []
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow ShopNow to access your photos.",
+          "cameraPermission": "Allow ShopNow to use your camera."
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow ShopNow to access your microphone."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "44f86e23-d940-40dd-b24e-2c050f284d5f"
+      }
     }
   }
 }
