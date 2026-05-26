@@ -8,6 +8,7 @@ import Animated, { FadeInUp } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useShopStore } from '@/store/shopStore';
 import { Colors, Radii, Shadows, Spacing, Typography } from '@/constants/theme';
+import AppIcon from '@/components/ui/AppIcon';
 
 export default function WishlistScreen() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function WishlistScreen() {
 
       {wishlist.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyIcon}>❤️</Text>
+          <AppIcon name="heart" size={64} color={Colors.labelSecondary} />
           <Text style={styles.emptyTitle}>Your wishlist is empty</Text>
           <Text style={styles.emptySubtitle}>Save items you love to buy them later</Text>
           <TouchableOpacity style={styles.shopBtn} onPress={() => router.back()}>
@@ -67,7 +68,7 @@ export default function WishlistScreen() {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                       }}
                     >
-                      <Text style={styles.removeWishText}>🗑️</Text>
+                      <AppIcon name="trash" size={18} color={Colors.red} />
                     </TouchableOpacity>
                   </View>
                 </View>

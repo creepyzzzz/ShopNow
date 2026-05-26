@@ -11,6 +11,7 @@ import { supabase } from '@/services/supabase/client';
 import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
 import { Colors, Radii, Shadows, Spacing, Typography } from '@/constants/theme';
+import AppIcon, { IconName } from '@/components/ui/AppIcon';
 import type { ConversationWithPartner, FriendRequest, AppUser } from '@/types/database';
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -241,20 +242,20 @@ export default function ChatsScreen() {
               style={styles.headerBtn}
               onPress={() => setShowSearch(!showSearch)}
             >
-              <Text style={styles.headerBtnIcon}>🔍</Text>
+              <AppIcon name="search" size={17} color={Colors.label} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.headerBtn}
               onPress={() => router.push('/(app)/settings')}
             >
-              <Text style={styles.headerBtnIcon}>⚙️</Text>
+              <AppIcon name="settings" size={17} color={Colors.label} />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Search bar */}
         <View style={styles.searchBar}>
-          <Text style={styles.searchIcon}>🔍</Text>
+          <AppIcon name="search" size={15} color={Colors.label} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search conversations..."
@@ -270,7 +271,7 @@ export default function ChatsScreen() {
         <Animated.View entering={FadeInDown.duration(200).springify().damping(20).stiffness(200)}>
           <View style={styles.friendSearchPanel}>
             <View style={styles.friendSearchBar}>
-              <Text style={styles.searchIcon}>👤</Text>
+              <AppIcon name="person" size={15} color={Colors.label} />
               <TextInput
                 style={styles.searchInput}
                 placeholder="Find users by username..."
@@ -326,7 +327,7 @@ export default function ChatsScreen() {
         }
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>💬</Text>
+            <AppIcon name="chat" size={56} color={Colors.labelSecondary} />
             <Text style={styles.emptyTitle}>No conversations yet</Text>
             <Text style={styles.emptySubtitle}>Search for users above to start chatting</Text>
           </View>
@@ -378,16 +379,16 @@ export default function ChatsScreen() {
       {/* ── Bottom Tab ─────────────────────────────────────── */}
       <View style={styles.bottomTab}>
         {[
-          { icon: '💬', label: 'Chats', active: true, path: '/(app)/chats' },
-          { icon: '🔒', label: 'Vault', active: false, path: '/(app)/vault' },
-          { icon: '⚙️', label: 'Settings', active: false, path: '/(app)/settings' },
+          { icon: 'chat', label: 'Chats', active: true, path: '/(app)/chats' },
+          { icon: 'lock', label: 'Vault', active: false, path: '/(app)/vault' },
+          { icon: 'settings', label: 'Settings', active: false, path: '/(app)/settings' },
         ].map((tab) => (
           <TouchableOpacity
             key={tab.label}
             style={styles.tabItem}
             onPress={() => router.push(tab.path as any)}
           >
-            <Text style={styles.tabIcon}>{tab.icon}</Text>
+            <AppIcon name={tab.icon as IconName} size={22} color={tab.active ? Colors.blue : Colors.labelSecondary} />
             <Text style={[styles.tabLabel, tab.active && styles.tabLabelActive]}>
               {tab.label}
             </Text>

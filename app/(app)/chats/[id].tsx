@@ -20,6 +20,7 @@ import { useChatStore } from '@/store/chatStore';
 import { Colors, Radii, Shadows, Spacing, Typography } from '@/constants/theme';
 import { BUCKET_MEDIA } from '@/constants/config';
 import AnimatedBubble from '@/components/ui/AnimatedBubble';
+import AppIcon from '@/components/ui/AppIcon';
 import type { Message, AppUser } from '@/types/database';
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -142,7 +143,7 @@ export default function ChatScreen() {
     if (!error && data) {
       // Update conversation last message
       await (supabase.from('conversations') as any).update({
-        last_message: type === 'text' ? content : `📎 ${type}`,
+        last_message: type === 'text' ? content : `Attachment: ${type}`,
         last_message_at: (data as any).created_at,
         last_message_type: type,
       }).eq('id', conversationId);
@@ -241,12 +242,15 @@ export default function ChatScreen() {
         isRead={item.is_read}
       >
         {isDeleted ? (
-          <Text style={styles.deletedText}>🚫 Message deleted</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <AppIcon name="close" size={14} color={Colors.labelTertiary} />
+            <Text style={styles.deletedText}>Message deleted</Text>
+          </View>
         ) : item.message_type === 'image' && item.media_url ? (
           <Image source={{ uri: item.media_url }} style={styles.mediaImage} resizeMode="cover" />
         ) : item.message_type === 'voice' && item.media_url ? (
           <TouchableOpacity style={styles.voiceRow}>
-            <Text style={styles.voiceIcon}>🎤</Text>
+            <AppIcon name="mic" size={18} color={isMine ? '#fff' : Colors.label} />
             <Text style={[styles.voiceText, isMine && styles.voiceTextMine]}>Voice note</Text>
             <Text style={styles.voicePlayIcon}>▶</Text>
           </TouchableOpacity>
@@ -270,7 +274,7 @@ export default function ChatScreen() {
       {/* ── Header ─────────────────────────────────────────── */}
       <BlurView intensity={72} tint="light" style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="back" size={24} color={Colors.blue} />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.partnerInfo}>
@@ -300,7 +304,7 @@ export default function ChatScreen() {
             setShowPanicConfirm(true);
           }}
         >
-          <Text style={styles.panicIcon}>🗑</Text>
+          <AppIcon name="trash" size={17} color={Colors.label} />
         </TouchableOpacity>
       </BlurView>
 
@@ -322,7 +326,7 @@ export default function ChatScreen() {
         onContentSizeChange={() => flatRef.current?.scrollToEnd({ animated: false })}
         ListEmptyComponent={
           <View style={styles.emptyChat}>
-            <Text style={styles.emptyChatIcon}>👋</Text>
+            <AppIcon name="wave" size={48} color={Colors.labelSecondary} />
             <Text style={styles.emptyChatText}>Say hello to {partner?.alias}!</Text>
           </View>
         }
@@ -334,7 +338,7 @@ export default function ChatScreen() {
           style={styles.attachBtn}
           onPress={() => setShowAttach(!showAttach)}
         >
-          <Text style={styles.attachIcon}>+</Text>
+          <AppIcon name="attach" size={20} color={Colors.blue} />
         </TouchableOpacity>
 
         <TextInput
@@ -374,7 +378,7 @@ export default function ChatScreen() {
             onPressIn={startRecording}
             onPressOut={stopRecording}
           >
-            <Text style={styles.sendIcon}>{isRecording ? '⏹' : '🎤'}</Text>
+            <AppIcon name={isRecording ? 'stop' : 'mic'} size={17} color="#fff" />
           </TouchableOpacity>
         )}
       </BlurView>
@@ -383,13 +387,13 @@ export default function ChatScreen() {
       {showAttach && (
         <View style={styles.attachPanel}>
           {[
-            { icon: '🖼️', label: 'Photo/Video', action: pickAndSendMedia },
-            { icon: '📷', label: 'Camera', action: () => { setShowAttach(false); } },
-            { icon: '🎞️', label: 'GIF', action: () => { setShowAttach(false); } },
-            { icon: '😀', label: 'Sticker', action: () => { setShowAttach(false); } },
+            { icon: 'image', label: 'Photo/Video', action: pickAndSendMedia },
+            { icon: 'camera', label: 'Camera', action: () => { setShowAttach(false); } },
+            { icon: 'film', label: 'GIF', action: () => { setShowAttach(false); } },
+            { icon: 'smile', label: 'Sticker', action: () => { setShowAttach(false); } },
           ].map((item) => (
             <TouchableOpacity key={item.label} style={styles.attachItem} onPress={item.action}>
-              <Text style={styles.attachItemIcon}>{item.icon}</Text>
+              <AppIcon name={item.icon as any} size={32} color={Colors.label} />
               <Text style={styles.attachItemLabel}>{item.label}</Text>
             </TouchableOpacity>
           ))}
@@ -400,7 +404,10 @@ export default function ChatScreen() {
       <Modal visible={showPanicConfirm} transparent animationType="fade">
         <View style={styles.panicOverlay}>
           <View style={styles.panicCard}>
-            <Text style={styles.panicTitle}>⚠️ Panic Delete</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <AppIcon name="warning" size={22} color={Colors.label} />
+              <Text style={[styles.panicTitle, { marginBottom: 0 }]}>Panic Delete</Text>
+            </View>
             <Text style={styles.panicDesc}>
               This will permanently delete ALL messages in this conversation for both sides.
               This cannot be undone.

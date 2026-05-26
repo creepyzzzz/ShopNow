@@ -32,14 +32,14 @@ export interface FakeOrder {
 }
 
 export const FAKE_CATEGORIES: FakeCategory[] = [
-  { id: '1', name: 'All', icon: '🏠' },
-  { id: '2', name: 'Fashion', icon: '👗' },
-  { id: '3', name: 'Electronics', icon: '📱' },
-  { id: '4', name: 'Beauty', icon: '💄' },
-  { id: '5', name: 'Home', icon: '🏡' },
-  { id: '6', name: 'Sports', icon: '⚽' },
-  { id: '7', name: 'Books', icon: '📚' },
-  { id: '8', name: 'Toys', icon: '🎮' },
+  { id: '1', name: 'All', icon: 'all' },
+  { id: '2', name: 'Fashion', icon: 'fashion' },
+  { id: '3', name: 'Electronics', icon: 'phone' },
+  { id: '4', name: 'Beauty', icon: 'beauty' },
+  { id: '5', name: 'Home', icon: 'house' },
+  { id: '6', name: 'Sports', icon: 'sports' },
+  { id: '7', name: 'Books', icon: 'book' },
+  { id: '8', name: 'Toys', icon: 'game' },
 ];
 
 export const FAKE_PRODUCTS: FakeProduct[] = [
@@ -312,21 +312,24 @@ export const FAKE_ORDERS: FakeOrder[] = [
 export const FAKE_BANNERS = [
   {
     id: 'b1',
-    title: '🔥 MEGA SALE',
+    title: 'MEGA SALE',
+    titleIcon: 'fire' as const,
     subtitle: 'Up to 80% Off Electronics',
     bg: ['#FF6B35', '#F5A623'],
     badge: 'Today Only',
   },
   {
     id: 'b2',
-    title: '💝 NEW ARRIVALS',
+    title: 'NEW ARRIVALS',
+    titleIcon: 'gift' as const,
     subtitle: 'Summer Fashion Collection',
     bg: ['#667eea', '#764ba2'],
     badge: 'Just Dropped',
   },
   {
     id: 'b3',
-    title: '⚡ FLASH DEAL',
+    title: 'FLASH DEAL',
+    titleIcon: 'flash' as const,
     subtitle: 'Electronics from ₹999',
     bg: ['#11998e', '#38ef7d'],
     badge: '2 hrs left',
@@ -334,14 +337,14 @@ export const FAKE_BANNERS = [
 ];
 
 export const SUPPORT_FAQS = [
-  { id: 'faq1', question: 'Where is my order?', icon: '📦' },
-  { id: 'faq2', question: 'How do I return an item?', icon: '🔄' },
-  { id: 'faq3', question: 'Payment failed, what should I do?', icon: '💳' },
-  { id: 'faq4', question: 'How to apply a coupon code?', icon: '🎟️' },
-  { id: 'faq5', question: 'Can I change my delivery address?', icon: '📍' },
-  { id: 'faq6', question: 'When will my refund be processed?', icon: '💰' },
-  { id: 'faq7', question: 'How to cancel my order?', icon: '❌' },
-  { id: 'faq8', question: 'Is COD available in my area?', icon: '🏠' },
-  { id: 'faq9', question: 'Product received is damaged', icon: '📋' },
-  { id: 'faq10', question: 'How to track my shipment?', icon: '🚚' },
+  { id: 'faq1', question: 'Where is my order?', icon: 'package' as const },
+  { id: 'faq2', question: 'How do I return an item?', icon: 'refresh' as const },
+  { id: 'faq3', question: 'Payment failed, what should I do?', icon: 'card' as const },
+  { id: 'faq4', question: 'How to apply a coupon code?', icon: 'coupon' as const },
+  { id: 'faq5', question: 'Can I change my delivery address?', icon: 'location' as const },
+  { id: 'faq6', question: 'When will my refund be processed?', icon: 'money' as const },
+  { id: 'faq7', question: 'How to cancel my order?', icon: 'cancel' as const },
+  { id: 'faq8', question: 'Is COD available in my area?', icon: 'home' as const },
+  { id: 'faq9', question: 'Product received is damaged', icon: 'clipboard' as const },
+  { id: 'faq10', question: 'How to track my shipment?', icon: 'truck' as const },
 ];

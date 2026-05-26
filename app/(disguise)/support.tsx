@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { SUPPORT_FAQS } from '@/constants/fakeData';
 import { Colors, Radii, Shadows, Spacing, Typography } from '@/constants/theme';
+import AppIcon from '@/components/ui/AppIcon';
 
 interface ChatMessage {
   id: string;
@@ -20,7 +21,7 @@ export default function SupportScreen() {
     {
       id: 'welcome',
       type: 'bot',
-      text: 'Hello! 👋 Welcome to ShopNow Customer Support.\nHow can we help you today?',
+      text: 'Hello! Welcome to ShopNow Customer Support.\nHow can we help you today?',
     },
   ]);
   const [showFAQs, setShowFAQs] = useState(true);
@@ -38,7 +39,7 @@ export default function SupportScreen() {
     const botMsg: ChatMessage = {
       id: `bot-${Date.now()}`,
       type: 'bot',
-      text: 'Please wait patiently, our customer representative will answer you as soon as possible. 🙏',
+      text: 'Please wait patiently, our customer representative will answer you as soon as possible.',
     };
 
     setMessages((prev) => [...prev, userMsg, botMsg]);
@@ -85,7 +86,7 @@ export default function SupportScreen() {
           >
             {msg.type === 'bot' && (
               <View style={styles.botAvatar}>
-                <Text style={styles.botAvatarText}>🛍️</Text>
+                <AppIcon name="bag" size={16} color={Colors.shopAccent} />
               </View>
             )}
             <View
@@ -118,7 +119,7 @@ export default function SupportScreen() {
                   onPress={() => handleFAQPress(faq.question)}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.faqIcon}>{faq.icon}</Text>
+                  <AppIcon name={faq.icon as any} size={18} color={Colors.shopAccent} />
                   <Text style={styles.faqText}>{faq.question}</Text>
                 </TouchableOpacity>
               ))}

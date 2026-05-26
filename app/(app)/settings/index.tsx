@@ -11,6 +11,7 @@ import { supabase } from '@/services/supabase/client';
 import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
 import { Colors, Radii, Shadows, Spacing, Typography } from '@/constants/theme';
+import AppIcon from '@/components/ui/AppIcon';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Settings Screen
@@ -18,7 +19,7 @@ import { Colors, Radii, Shadows, Spacing, Typography } from '@/constants/theme';
 export default function SettingsScreen() {
   const router = useRouter();
   const { user, signOut, panicWipe } = useAuthStore();
-  const { setConversations, setMessages } = useChatStore();
+  const { setConversations } = useChatStore();
   const [notifDisguise, setNotifDisguise] = useState(true);
   const [panicEnabled, setPanicEnabled] = useState(true);
   const [biometricVault, setBiometricVault] = useState(false);
@@ -65,7 +66,7 @@ export default function SettingsScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="back" size={24} color={Colors.blue} />
         </TouchableOpacity>
         <Text style={styles.title}>Settings</Text>
         <View style={{ width: 40 }} />
@@ -91,7 +92,9 @@ export default function SettingsScreen() {
           <View style={styles.section}>
           <View style={styles.settingRow}>
             <View style={styles.settingInfo}>
-              <Text style={styles.settingIcon}>🔔</Text>
+              <View style={styles.settingIconWrap}>
+                <AppIcon name="bell" size={20} color={Colors.label} />
+              </View>
               <View>
                 <Text style={styles.settingTitle}>Disguised Notifications</Text>
                 <Text style={styles.settingDesc}>Show fake shopping notifications</Text>
@@ -107,7 +110,9 @@ export default function SettingsScreen() {
 
           <View style={styles.settingRow}>
             <View style={styles.settingInfo}>
-              <Text style={styles.settingIcon}>🚨</Text>
+              <View style={styles.settingIconWrap}>
+                <AppIcon name="alarm" size={20} color={Colors.red} />
+              </View>
               <View>
                 <Text style={styles.settingTitle}>Panic Delete</Text>
                 <Text style={styles.settingDesc}>Allow long-press panic button</Text>
@@ -123,7 +128,9 @@ export default function SettingsScreen() {
 
           <View style={styles.settingRow}>
             <View style={styles.settingInfo}>
-              <Text style={styles.settingIcon}>🫆</Text>
+              <View style={styles.settingIconWrap}>
+                <AppIcon name="fingerprint" size={20} color={Colors.label} />
+              </View>
               <View>
                 <Text style={styles.settingTitle}>Biometric Vault</Text>
                 <Text style={styles.settingDesc}>Unlock vault with fingerprint/face</Text>
@@ -144,7 +151,9 @@ export default function SettingsScreen() {
           <View style={styles.section}>
           <TouchableOpacity style={styles.settingRow}>
             <View style={styles.settingInfo}>
-              <Text style={styles.settingIcon}>🛒</Text>
+              <View style={styles.settingIconWrap}>
+                <AppIcon name="cart" size={20} color={Colors.label} />
+              </View>
               <View>
                 <Text style={styles.settingTitle}>App Disguise Name</Text>
                 <Text style={styles.settingDesc}>Appears as "ShopNow" publicly</Text>
@@ -156,7 +165,9 @@ export default function SettingsScreen() {
 
           <TouchableOpacity style={styles.settingRow}>
             <View style={styles.settingInfo}>
-              <Text style={styles.settingIcon}>🎭</Text>
+              <View style={styles.settingIconWrap}>
+                <AppIcon name="mask" size={20} color={Colors.label} />
+              </View>
               <View>
                 <Text style={styles.settingTitle}>Change Alias</Text>
                 <Text style={styles.settingDesc}>{user?.alias}</Text>
@@ -173,7 +184,9 @@ export default function SettingsScreen() {
           <View style={styles.section}>
           <TouchableOpacity style={styles.settingRow} onPress={handleSignOut}>
             <View style={styles.settingInfo}>
-              <Text style={styles.settingIcon}>🚪</Text>
+              <View style={styles.settingIconWrap}>
+                <AppIcon name="door" size={20} color={Colors.orange} />
+              </View>
               <Text style={[styles.settingTitle, { color: Colors.orange }]}>Sign Out</Text>
             </View>
             <Text style={styles.chevron}>›</Text>
@@ -185,7 +198,9 @@ export default function SettingsScreen() {
             onPress={handleFullPanic}
           >
             <View style={styles.settingInfo}>
-              <Text style={styles.settingIcon}>💥</Text>
+              <View style={styles.settingIconWrap}>
+                <AppIcon name="explosion" size={20} color={Colors.red} />
+              </View>
               <View>
                 <Text style={[styles.settingTitle, { color: Colors.red }]}>Panic Wipe</Text>
                 <Text style={styles.settingDesc}>Erase everything and close app</Text>
@@ -240,7 +255,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 14,
   },
   settingInfo: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
-  settingIcon: { fontSize: 20, width: 28 },
+  settingIconWrap: { width: 28, alignItems: 'center' },
   settingTitle: { ...Typography.subheadline, color: Colors.label, fontWeight: '600' },
   settingDesc: { ...Typography.caption1, color: Colors.labelSecondary, marginTop: 2 },
   divider: { height: 0.5, backgroundColor: Colors.separator, marginLeft: 56 },

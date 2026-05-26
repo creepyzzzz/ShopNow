@@ -8,17 +8,18 @@ import Animated, { FadeInUp } from 'react-native-reanimated';
 import { useShopStore } from '@/store/shopStore';
 import { useAuthStore } from '@/store/authStore';
 import { Colors, Radii, Shadows, Spacing, Typography } from '@/constants/theme';
+import AppIcon, { IconName } from '@/components/ui/AppIcon';
 
-const MENU_ITEMS = [
-  { icon: '📦', label: 'My Orders', route: '/(disguise)/orders' },
-  { icon: '❤️', label: 'Wishlist', route: '/(disguise)/wishlist' },
-  { icon: '📍', label: 'Saved Addresses', route: null },
-  { icon: '💳', label: 'Payment Methods', route: null },
-  { icon: '🎟️', label: 'Coupons & Offers', route: null },
-  { icon: '🔔', label: 'Notification Settings', route: null },
-  { icon: '❓', label: 'Help & Support', route: '/(disguise)/support' },
-  { icon: '📄', label: 'Terms & Conditions', route: null },
-  { icon: '🔒', label: 'Privacy Policy', route: null },
+const MENU_ITEMS: { icon: IconName; label: string; route: string | null }[] = [
+  { icon: 'package', label: 'My Orders', route: '/(disguise)/orders' },
+  { icon: 'heart', label: 'Wishlist', route: '/(disguise)/wishlist' },
+  { icon: 'location', label: 'Saved Addresses', route: null },
+  { icon: 'card', label: 'Payment Methods', route: null },
+  { icon: 'coupon', label: 'Coupons & Offers', route: null },
+  { icon: 'bell', label: 'Notification Settings', route: null },
+  { icon: 'help', label: 'Help & Support', route: '/(disguise)/support' },
+  { icon: 'document', label: 'Terms & Conditions', route: null },
+  { icon: 'lock', label: 'Privacy Policy', route: null },
 ];
 
 export default function ProfileScreen() {
@@ -41,7 +42,7 @@ export default function ProfileScreen() {
         {/* Avatar & Name */}
         <Animated.View entering={FadeInUp.springify()} style={styles.profileCard}>
           <View style={styles.avatarCircle}>
-            <Text style={styles.avatarEmoji}>👤</Text>
+            <AppIcon name="person" size={36} color={Colors.shopAccent} />
           </View>
           <Text style={styles.profileName}>
             {isAuthenticated && user ? user.username : profile.name}
@@ -98,7 +99,7 @@ export default function ProfileScreen() {
                 }}
                 activeOpacity={0.7}
               >
-                <Text style={styles.menuIcon}>{item.icon}</Text>
+                <AppIcon name={item.icon} size={20} color={Colors.label} />
                 <Text style={styles.menuLabel}>{item.label}</Text>
                 <Text style={styles.menuArrow}>›</Text>
               </TouchableOpacity>

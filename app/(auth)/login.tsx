@@ -5,13 +5,13 @@ import {
   ScrollView, ActivityIndicator, Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '@/services/supabase/client';
 import { useAuthStore } from '@/store/authStore';
 import { Colors, Radii, Shadows, Spacing, Typography } from '@/constants/theme';
+import AppIcon from '@/components/ui/AppIcon';
 
-export default function LoginScreen() {
+export default function ShopLoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,7 +42,7 @@ export default function LoginScreen() {
           .single();
         if (profile) {
           useAuthStore.getState().setUser(profile);
-          router.replace('/(app)/chats');
+          router.replace('/(app)/chats'); // Since they logged in, take them to the stealth app
         } else {
           router.replace('/(onboarding)/welcome');
         }
@@ -55,141 +55,125 @@ export default function LoginScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      {/* Gradient Background */}
-      <View style={styles.bg}>
-        <View style={styles.bgBlob1} />
-        <View style={styles.bgBlob2} />
-      </View>
-
       <ScrollView
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Logo */}
-        <View style={styles.logoSection}>
-          <View style={styles.logoIcon}>
-            <Text style={styles.logoEmoji}>💬</Text>
+        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+          <AppIcon name="back" size={24} color={Colors.label} />
+        </TouchableOpacity>
+
+        <View style={styles.headerSection}>
+          <View style={styles.iconCircle}>
+            <AppIcon name="bag" size={42} color={Colors.shopAccent} />
           </View>
-          <Text style={styles.appName}>StealthChat</Text>
-          <Text style={styles.tagline}>Private. Secure. Always.</Text>
+          <Text style={styles.title}>Welcome to ShopNow</Text>
+          <Text style={styles.subtitle}>Sign in to access your orders, wishlists and special offers.</Text>
         </View>
 
-        {/* Card */}
-        <BlurView intensity={80} tint="light" style={styles.card}>
-          <Text style={styles.cardTitle}>Welcome back</Text>
-          <Text style={styles.cardSubtitle}>Sign in to continue</Text>
-
-          {/* Email */}
-          <View style={styles.inputWrapper}>
-            <Text style={styles.inputLabel}>Email</Text>
+        <View style={styles.formSection}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Email Address</Text>
             <View style={styles.inputRow}>
-              <Text style={styles.inputIcon}>✉️</Text>
+              <AppIcon name="mail" size={20} color={Colors.labelTertiary} />
               <TextInput
                 style={styles.input}
-                placeholder="your@email.com"
+                placeholder="Enter your email"
                 placeholderTextColor={Colors.labelTertiary}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                autoComplete="email"
               />
             </View>
           </View>
 
-          {/* Password */}
-          <View style={styles.inputWrapper}>
+          <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Password</Text>
             <View style={styles.inputRow}>
-              <Text style={styles.inputIcon}>🔒</Text>
+              <AppIcon name="lock" size={20} color={Colors.labelTertiary} />
               <TextInput
                 style={styles.input}
-                placeholder="••••••••"
+                placeholder="Enter your password"
                 placeholderTextColor={Colors.labelTertiary}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPass}
-                autoComplete="password"
+                autoCapitalize="none"
               />
               <TouchableOpacity onPress={() => setShowPass(!showPass)}>
-                <Text style={styles.showPassText}>{showPass ? 'Hide' : 'Show'}</Text>
+                <AppIcon name={showPass ? 'eye-off' : 'eye'} size={20} color={Colors.labelTertiary} />
               </TouchableOpacity>
             </View>
           </View>
 
-          {/* Login Button */}
+          <TouchableOpacity style={styles.forgotPassBtn}>
+            <Text style={styles.forgotPassText}>Forgot Password?</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={[styles.loginBtn, loading && styles.loginBtnDisabled]}
             onPress={handleLogin}
             disabled={loading}
-            activeOpacity={0.85}
           >
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.loginBtnText}>Sign In →</Text>
+              <Text style={styles.loginBtnText}>Sign In</Text>
             )}
           </TouchableOpacity>
 
-        </BlurView>
+          <View style={styles.registerRow}>
+            <Text style={styles.registerText}>Don't have an account? </Text>
+            <TouchableOpacity onPress={() => router.replace('/(auth)/register')}>
+              <Text style={styles.registerLink}>Sign up</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0A0A2E' },
-  bg: { ...StyleSheet.absoluteFill },
-  bgBlob1: {
-    position: 'absolute', width: 300, height: 300, borderRadius: 150,
-    backgroundColor: 'rgba(0,122,255,0.3)', top: -80, left: -80,
+  container: { flex: 1, backgroundColor: Colors.background },
+  scroll: { flexGrow: 1, padding: Spacing.screenPadding, paddingTop: 60 },
+  backBtn: { alignSelf: 'flex-start', marginBottom: 20 },
+  
+  headerSection: { alignItems: 'center', marginBottom: 40 },
+  iconCircle: {
+    width: 80, height: 80, borderRadius: 40,
+    backgroundColor: Colors.shopAccentLight,
+    justifyContent: 'center', alignItems: 'center',
+    marginBottom: 16,
   },
-  bgBlob2: {
-    position: 'absolute', width: 250, height: 250, borderRadius: 125,
-    backgroundColor: 'rgba(175,82,222,0.25)', bottom: 100, right: -60,
-  },
-  scroll: { flexGrow: 1, justifyContent: 'center', padding: Spacing.screenPadding },
+  title: { ...Typography.title2, color: Colors.label, marginBottom: 8, fontWeight: '800' },
+  subtitle: { ...Typography.body, color: Colors.labelSecondary, textAlign: 'center', paddingHorizontal: 20 },
 
-  logoSection: { alignItems: 'center', marginBottom: 32 },
-  logoIcon: {
-    width: 80, height: 80, borderRadius: 24,
-    backgroundColor: Colors.blue, justifyContent: 'center', alignItems: 'center',
-    marginBottom: 12, ...Shadows.lg,
-  },
-  logoEmoji: { fontSize: 36 },
-  appName: { fontSize: 28, fontWeight: '800', color: '#fff', letterSpacing: 0.5 },
-  tagline: { fontSize: 14, color: 'rgba(255,255,255,0.6)', marginTop: 4 },
-
-  card: {
-    borderRadius: Radii.sheet, padding: 28,
-    overflow: 'hidden',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)',
-    ...Shadows.lg,
-  },
-  cardTitle: { ...Typography.title2, color: Colors.label, marginBottom: 4 },
-  cardSubtitle: { ...Typography.subheadline, color: Colors.labelSecondary, marginBottom: 24 },
-
-  inputWrapper: { marginBottom: 16 },
-  inputLabel: { ...Typography.footnote, fontWeight: '600', color: Colors.labelSecondary, marginBottom: 8 },
+  formSection: { flex: 1 },
+  inputContainer: { marginBottom: 20 },
+  inputLabel: { ...Typography.subheadline, color: Colors.label, fontWeight: '600', marginBottom: 8 },
   inputRow: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: Colors.fillTertiary, borderRadius: Radii.md,
-    paddingHorizontal: 14, paddingVertical: 14,
+    borderWidth: 1, borderColor: Colors.separator,
+    borderRadius: Radii.md, paddingHorizontal: 14, paddingVertical: 12,
+    backgroundColor: Colors.surface, gap: 10,
   },
-  inputIcon: { fontSize: 16, marginRight: 10 },
   input: { flex: 1, ...Typography.body, color: Colors.label },
-  showPassText: { ...Typography.footnote, color: Colors.blue, fontWeight: '600' },
+
+  forgotPassBtn: { alignSelf: 'flex-end', marginBottom: 24 },
+  forgotPassText: { ...Typography.footnote, color: Colors.shopAccent, fontWeight: '600' },
 
   loginBtn: {
-    backgroundColor: Colors.blue, borderRadius: Radii.lg,
-    paddingVertical: 16, alignItems: 'center', marginTop: 8,
-    ...Shadows.md,
+    backgroundColor: Colors.shopAccent, borderRadius: Radii.md,
+    paddingVertical: 16, alignItems: 'center',
+    ...Shadows.sm,
   },
   loginBtnDisabled: { opacity: 0.7 },
-  loginBtnText: { color: '#fff', fontSize: 17, fontWeight: '700' },
+  loginBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 
-  registerRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 20 },
+  registerRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 24 },
   registerText: { ...Typography.subheadline, color: Colors.labelSecondary },
-  registerLink: { ...Typography.subheadline, color: Colors.blue, fontWeight: '600' },
+  registerLink: { ...Typography.subheadline, color: Colors.shopAccent, fontWeight: '700' },
 });

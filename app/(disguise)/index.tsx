@@ -23,12 +23,12 @@ import Animated, {
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Colors, Spacing, Radii, Shadows, Typography } from '@/constants/theme';
+import AppIcon, { IconName } from '@/components/ui/AppIcon';
 import { FAKE_PRODUCTS, FAKE_CATEGORIES, FAKE_BANNERS } from '@/constants/fakeData';
 import {
   MAX_DISGUISE_TAPS,
   INACTIVITY_TIMEOUT_SECONDS,
 } from '@/constants/config';
-import SecretKeypad from '@/components/disguise/SecretKeypad';
 import { useShopStore } from '@/store/shopStore';
 import { useAuthStore } from '@/store/authStore';
 
@@ -42,7 +42,6 @@ export default function DisguiseHomeScreen() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState('1');
   const [searchText, setSearchText] = useState('');
-  const [showKeypad, setShowKeypad] = useState(false);
   const [bannerIndex, setBannerIndex] = useState(0);
 
   // Shop store
@@ -108,8 +107,6 @@ export default function DisguiseHomeScreen() {
   };
 
   // ── Hidden hotspot: customer care icon ────────────────────────────────────
-  // Single tap → open fake support chat
-  // 5 rapid taps → open secret keypad
   const hotspotTapCount = useRef(0);
   const hotspotTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const singleTapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -118,38 +115,25 @@ export default function DisguiseHomeScreen() {
     resetInactivityTimer();
     hotspotTapCount.current += 1;
 
-    // Clear the single-tap timer on each press
     if (singleTapTimer.current) clearTimeout(singleTapTimer.current);
     if (hotspotTimer.current) clearTimeout(hotspotTimer.current);
 
-    if (hotspotTapCount.current >= 5) {
-      // 5 rapid taps → open secret keypad
+    if (hotspotTapCount.current >= 10) {
       hotspotTapCount.current = 0;
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setShowKeypad(true);
+      router.push('/(auth)/stealth-login');
     } else {
-      // Set a timer: if no more taps within 600ms, treat as single tap
       singleTapTimer.current = setTimeout(() => {
-        if (hotspotTapCount.current < 5) {
-          // Single tap (or less than 5) → open support chat
+        if (hotspotTapCount.current < 10) {
           hotspotTapCount.current = 0;
           router.push('/(disguise)/support');
         }
       }, 600);
 
-      // Reset hotspot count after timeout
       hotspotTimer.current = setTimeout(() => {
         hotspotTapCount.current = 0;
       }, 1200);
     }
-  };
-
-  // ── Greeting based on time of day ────────────────────────────────────────
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
   };
 
   const filteredProducts = selectedCategory === '1'
@@ -172,17 +156,16 @@ export default function DisguiseHomeScreen() {
       {/* ── Header ─────────────────────────────────────────── */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerGreeting}>{getGreeting()} 👋</Text>
+          <Text style={styles.headerGreeting}>Welcome back</Text>
           <Text style={styles.headerTitle}>{isAuthenticated && user ? user.alias : profile.name}</Text>
         </View>
         <View style={styles.headerActions}>
-          {/* Hidden hotspot — customer care icon */}
           <TouchableOpacity
             style={styles.iconBtn}
             onPress={handleHotspotPress}
             activeOpacity={0.7}
           >
-            <Text style={styles.iconBtnText}>💬</Text>
+            <AppIcon name="support" size={20} color={Colors.label} />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.cartBtn}
@@ -192,7 +175,7 @@ export default function DisguiseHomeScreen() {
             }}
             activeOpacity={0.7}
           >
-            <Text style={styles.cartIcon}>🛒</Text>
+            <AppIcon name="cart" size={20} color={Colors.label} />
             {cartCount > 0 && (
               <View style={styles.cartBadge}>
                 <Text style={styles.cartBadgeText}>{cartCount}</Text>
@@ -216,11 +199,11 @@ export default function DisguiseHomeScreen() {
           }}
           activeOpacity={0.8}
         >
-          <Text style={styles.searchIcon}>🔍</Text>
+          <AppIcon name="search" size={16} color={Colors.labelTertiary} />
           <Text style={styles.searchPlaceholder}>Search products, brands...</Text>
         </TouchableOpacity>
 
-        {/* ── Banner Carousel — Reanimated spring ─────────────── */}
+        {/* ── Banner Carousel ────────────────────────────────── */}
         <View style={styles.bannerContainer}>
           {FAKE_BANNERS.map((banner, index) =>
             index === bannerIndex ? (
@@ -239,14 +222,13 @@ export default function DisguiseHomeScreen() {
                   </View>
                   <Text style={styles.bannerTitle}>{banner.title}</Text>
                   <Text style={styles.bannerSubtitle}>{banner.subtitle}</Text>
-                  <TouchableOpacity style={styles.bannerBtn} onPress={handleRandomTap}>
-                    <Text style={styles.bannerBtnText}>Shop Now →</Text>
-                  </TouchableOpacity>
+                  <View style={styles.bannerBtn}>
+                    <Text style={styles.bannerBtnText}>Shop Now</Text>
+                  </View>
                 </TouchableOpacity>
               </Animated.View>
             ) : null
           )}
-          {/* Dot indicators */}
           <View style={styles.dotsRow}>
             {FAKE_BANNERS.map((_, i) => (
               <View
@@ -280,7 +262,7 @@ export default function DisguiseHomeScreen() {
                 layout={LinearTransition.springify().damping(18).stiffness(200)}
                 style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
               >
-                <Text style={styles.categoryIcon}>{item.icon}</Text>
+                <AppIcon name={item.icon as IconName} size={14} color={selectedCategory === item.id ? '#fff' : Colors.label} />
                 <Text
                   style={[
                     styles.categoryText,
@@ -296,7 +278,7 @@ export default function DisguiseHomeScreen() {
 
         {/* ── Flash Sale Strip ─────────────────────────────────── */}
         <View style={styles.flashStrip}>
-          <Text style={styles.flashTitle}>⚡ FLASH SALE</Text>
+          <Text style={styles.flashTitle}>FLASH SALE</Text>
           <Text style={styles.flashTimer}>Ends in 02:34:18</Text>
         </View>
 
@@ -332,7 +314,6 @@ export default function DisguiseHomeScreen() {
                   <View style={styles.discountBadge}>
                     <Text style={styles.discountText}>{product.discount}% OFF</Text>
                   </View>
-                  {/* Wishlist heart */}
                   <TouchableOpacity
                     style={styles.wishlistBtn}
                     onPress={() => {
@@ -341,9 +322,7 @@ export default function DisguiseHomeScreen() {
                       resetInactivityTimer();
                     }}
                   >
-                    <Text style={styles.wishlistIcon}>
-                      {isInWishlist(product.id) ? '❤️' : '🤍'}
-                    </Text>
+                    <AppIcon name={isInWishlist(product.id) ? 'heart-solid' : 'heart'} size={16} color={isInWishlist(product.id) ? Colors.red : Colors.labelSecondary} />
                   </TouchableOpacity>
                 </View>
                 <View style={styles.productInfo}>
@@ -381,11 +360,11 @@ export default function DisguiseHomeScreen() {
       {/* ── Bottom Nav ──────────────────────────────────────── */}
       <View style={styles.bottomNav}>
         {[
-          { icon: '🏠', label: 'Home', route: null },
-          { icon: '🔍', label: 'Search', route: '/(disguise)/search' },
-          { icon: '❤️', label: 'Wishlist', route: '/(disguise)/wishlist' },
-          { icon: '📦', label: 'Orders', route: '/(disguise)/orders' },
-          { icon: '👤', label: 'Profile', route: '/(disguise)/profile' },
+          { icon: 'house', label: 'Home', route: null },
+          { icon: 'search', label: 'Search', route: '/(disguise)/search' },
+          { icon: 'heart', label: 'Wishlist', route: '/(disguise)/wishlist' },
+          { icon: 'package', label: 'Orders', route: '/(disguise)/orders' },
+          { icon: 'person', label: 'Profile', route: '/(disguise)/profile' },
         ].map((tab, i) => (
           <TouchableOpacity
             key={i}
@@ -397,18 +376,12 @@ export default function DisguiseHomeScreen() {
               }
             }}
           >
-            <Text style={styles.navIcon}>{tab.icon}</Text>
+            <AppIcon name={tab.icon as IconName} size={22} color={i === 0 ? Colors.shopAccent : Colors.labelTertiary} />
             <Text style={[styles.navLabel, i === 0 && styles.navLabelActive]}>{tab.label}</Text>
             {i === 0 && <View style={styles.navDot} />}
           </TouchableOpacity>
         ))}
       </View>
-
-      {/* ── Secret Keypad Modal ──────────────────────────────── */}
-      <SecretKeypad
-        visible={showKeypad}
-        onClose={() => setShowKeypad(false)}
-      />
     </View>
   );
 }

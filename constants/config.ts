@@ -32,14 +32,14 @@ export const TENOR_API_KEY = 'LIVDSRZULELA';
 
 // Fake notification copy pool
 export const FAKE_NOTIFICATION_POOL = [
-  { title: 'ShopNow 🔥', body: 'Flash Sale: 80% off! Limited time only.' },
-  { title: 'ShopNow 📦', body: 'You left something in cart #4821 see it...!' },
-  { title: 'ShopNow 💝', body: '100% discount unlocked just for you.' },
-  { title: 'ShopNow ⚡', body: 'New arrivals just dropped. Shop now!' },
-  { title: 'ShopNow 🛍️', body: 'Exclusive deal: Buy 2, Get 1 FREE today.' },
-  { title: 'ShopNow 🎁', body: 'Your wishlist item is back in stock!' },
-  { title: 'ShopNow ✅', body: 'Order #3310 delivered successfully.' },
-  { title: 'ShopNow 💰', body: 'Earn 500 coins on your next purchase.' },
+  { title: 'ShopNow', body: 'Flash Sale: 80% off! Limited time only.' },
+  { title: 'ShopNow', body: 'You left something in cart #4821 see it...!' },
+  { title: 'ShopNow', body: '100% discount unlocked just for you.' },
+  { title: 'ShopNow', body: 'New arrivals just dropped. Shop now!' },
+  { title: 'ShopNow', body: 'Exclusive deal: Buy 2, Get 1 FREE today.' },
+  { title: 'ShopNow', body: 'Your wishlist item is back in stock!' },
+  { title: 'ShopNow', body: 'Order #3310 delivered successfully.' },
+  { title: 'ShopNow', body: 'Earn 500 coins on your next purchase.' },
 ];
 
 // App version

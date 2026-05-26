@@ -9,6 +9,7 @@ import * as Haptics from 'expo-haptics';
 import { FAKE_PRODUCTS } from '@/constants/fakeData';
 import { useShopStore } from '@/store/shopStore';
 import { Colors, Radii, Shadows, Spacing, Typography } from '@/constants/theme';
+import AppIcon, { IconName } from '@/components/ui/AppIcon';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
@@ -35,7 +36,7 @@ export default function SearchScreen() {
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
         <View style={styles.searchBar}>
-          <Text style={styles.searchIcon}>🔍</Text>
+          <AppIcon name="search" size={16} color={Colors.label} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search products, brands..."
@@ -61,27 +62,35 @@ export default function SearchScreen() {
               style={styles.recentItem}
               onPress={() => setQuery(s)}
             >
-              <Text style={styles.recentIcon}>🕐</Text>
+              <AppIcon name="clock" size={16} color={Colors.labelSecondary} />
               <Text style={styles.recentText}>{s}</Text>
             </TouchableOpacity>
           ))}
 
           <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Popular Categories</Text>
           <View style={styles.categoryGrid}>
-            {['👗 Fashion', '📱 Electronics', '💄 Beauty', '🏡 Home', '⚽ Sports', '📚 Books'].map((cat) => (
+            {[
+              { icon: 'fashion', label: 'Fashion' },
+              { icon: 'phone', label: 'Electronics' },
+              { icon: 'beauty', label: 'Beauty' },
+              { icon: 'house', label: 'Home' },
+              { icon: 'sports', label: 'Sports' },
+              { icon: 'book', label: 'Books' }
+            ].map((cat) => (
               <TouchableOpacity
-                key={cat}
+                key={cat.label}
                 style={styles.categoryChip}
-                onPress={() => setQuery(cat.split(' ')[1])}
+                onPress={() => setQuery(cat.label)}
               >
-                <Text style={styles.categoryChipText}>{cat}</Text>
+                <AppIcon name={cat.icon as IconName} size={16} color={Colors.label} />
+                <Text style={styles.categoryChipText}>{cat.label}</Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
       ) : results.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyIcon}>🔍</Text>
+          <AppIcon name="search" size={48} color={Colors.labelSecondary} />
           <Text style={styles.emptyTitle}>No results found</Text>
           <Text style={styles.emptySubtitle}>Try a different search term</Text>
         </View>

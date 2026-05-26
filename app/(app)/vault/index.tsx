@@ -14,6 +14,7 @@ import { BlurView } from 'expo-blur';
 import { supabase } from '@/services/supabase/client';
 import { useAuthStore } from '@/store/authStore';
 import { Colors, Radii, Shadows, Spacing, Typography } from '@/constants/theme';
+import AppIcon from '@/components/ui/AppIcon';
 import { BUCKET_VAULT } from '@/constants/config';
 import type { VaultItem } from '@/types/database';
 
@@ -150,9 +151,12 @@ export default function VaultScreen() {
       {/* ── Header ─────────────────────────────────────────── */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="back" size={24} color={Colors.blue} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>🔒 Vault</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <AppIcon name="lock" size={20} color={Colors.label} />
+          <Text style={styles.headerTitle}>Vault</Text>
+        </View>
         {unlocked && (
           <TouchableOpacity style={styles.addBtn} onPress={addToVault} disabled={uploading}>
             {uploading ? <ActivityIndicator size="small" color={Colors.blue} /> : <Text style={styles.addIcon}>+</Text>}
@@ -175,7 +179,7 @@ export default function VaultScreen() {
             columnWrapperStyle={{ gap: 4 }}
             ListEmptyComponent={
               <View style={styles.empty}>
-                <Text style={styles.emptyIcon}>🔒</Text>
+                <AppIcon name="lock" size={56} color={Colors.labelSecondary} />
                 <Text style={styles.emptyTitle}>Vault is empty</Text>
                 <Text style={styles.emptySubtitle}>Add photos and videos to encrypt them</Text>
                 <TouchableOpacity style={styles.addFirstBtn} onPress={addToVault}>
@@ -192,11 +196,11 @@ export default function VaultScreen() {
                     <Image source={{ uri: item.encrypted_url }} style={styles.cellImage} />
                   ) : (
                     <View style={[styles.cellImage, styles.videoCellFallback]}>
-                      <Text style={{ fontSize: 28 }}>🎬</Text>
+                      <AppIcon name="film" size={28} color={Colors.label} />
                     </View>
                   )}
                   <View style={styles.lockOverlay}>
-                    <Text style={styles.lockIcon}>🔒</Text>
+                    <AppIcon name="lock" size={10} color="#fff" />
                   </View>
                 </TouchableOpacity>
               </Animated.View>
@@ -205,11 +209,14 @@ export default function VaultScreen() {
         )
       ) : (
         <View style={styles.lockedState}>
-          <Text style={styles.lockedIcon}>🔐</Text>
+          <AppIcon name="shield-lock" size={72} color={Colors.label} />
           <Text style={styles.lockedTitle}>Vault Locked</Text>
           <Text style={styles.lockedSubtitle}>Use biometrics or PIN to unlock</Text>
           <TouchableOpacity style={styles.biometricBtn} onPress={tryBiometric}>
-            <Text style={styles.biometricText}>🫆 Use Biometrics</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <AppIcon name="fingerprint" size={18} color="#fff" />
+              <Text style={styles.biometricText}>Use Biometrics</Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.pinBtn} onPress={() => setShowPinModal(true)}>
             <Text style={styles.pinBtnText}>Enter PIN</Text>

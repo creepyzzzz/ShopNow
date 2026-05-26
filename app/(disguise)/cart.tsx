@@ -8,6 +8,7 @@ import Animated, { FadeInUp } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useShopStore } from '@/store/shopStore';
 import { Colors, Radii, Shadows, Spacing, Typography } from '@/constants/theme';
+import AppIcon from '@/components/ui/AppIcon';
 
 export default function CartScreen() {
   const router = useRouter();
@@ -57,7 +58,7 @@ export default function CartScreen() {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
               }}
             >
-              <Text style={styles.removeText}>🗑️</Text>
+              <AppIcon name="trash" size={18} color={Colors.red} />
             </TouchableOpacity>
           </View>
         </View>
@@ -82,7 +83,7 @@ export default function CartScreen() {
 
       {cart.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyIcon}>🛒</Text>
+          <AppIcon name="cart" size={64} color={Colors.labelSecondary} />
           <Text style={styles.emptyTitle}>Your cart is empty</Text>
           <Text style={styles.emptySubtitle}>Add items to your cart to see them here</Text>
           <TouchableOpacity style={styles.shopBtn} onPress={() => router.back()}>
