@@ -16,12 +16,8 @@ export default function CartScreen() {
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
-    Alert.alert(
-      'Order Placed! 🎉',
-      `Your order of ₹${getCartTotal().toLocaleString()} has been placed successfully.`,
-      [{ text: 'OK', onPress: () => { clearCart(); router.back(); } }]
-    );
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    router.push('/(disguise)/checkout');
   };
 
   const renderItem = ({ item, index }: any) => (

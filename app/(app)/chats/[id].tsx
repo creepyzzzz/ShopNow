@@ -43,6 +43,7 @@ export default function ChatScreen() {
   const [isRecording, setIsRecording] = useState(false);
   const [showPanicConfirm, setShowPanicConfirm] = useState(false);
   const [typingVisible, setTypingVisible] = useState(false);
+  const [isEphemeral, setIsEphemeral] = useState(false);
 
   const flatRef = useRef<FlatList>(null);
   const convMessages = messages[conversationId] || [];
@@ -118,12 +119,14 @@ export default function ChatScreen() {
     setSending(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
+    const finalContent = (isEphemeral && type === 'text') ? `[EPH]${content}` : content;
+
     const optimisticMsg: Message = {
       id: `temp_${Date.now()}`,
       conversation_id: conversationId,
       sender_id: user.id,
       message_type: type,
-      content: content || null,
+      content: finalContent || null,
       media_url: mediaUrl || null,
       is_deleted: false,
       is_read: false,
@@ -136,7 +139,7 @@ export default function ChatScreen() {
       conversation_id: conversationId,
       sender_id: user.id,
       message_type: type,
-      content: content || null,
+      content: finalContent || null,
       media_url: mediaUrl || null,
     }).select().single();
 
@@ -228,11 +231,29 @@ export default function ChatScreen() {
     router.back();
   };
 
+  // ── Ephemeral Message Wrapper ────────────────────────────────────────────
+  const EphemeralText = ({ content, msgId }: { content: string, msgId: string }) => {
+    const [expired, setExpired] = useState(false);
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setExpired(true);
+        // Optionally delete from Supabase, but local is fine for disguise
+      }, 10000); // 10 seconds for demo
+      return () => clearTimeout(timer);
+    }, []);
+
+    if (expired) return <Text style={styles.deletedText}>Message expired ⏳</Text>;
+    return <Text style={[styles.bubbleText, styles.ephemeralText]}>🔥 {content}</Text>;
+  };
+
   // ── Message bubble ───────────────────────────────────────────────────────
   const renderMessage = ({ item, index }: { item: Message; index: number }) => {
     const isMine = item.sender_id === user?.id;
     const isDeleted = item.is_deleted;
     const timestamp = new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const isEph = item.content?.startsWith('[EPH]');
+    const cleanContent = isEph ? item.content?.slice(5) : item.content;
 
     return (
       <AnimatedBubble
@@ -256,9 +277,11 @@ export default function ChatScreen() {
           </TouchableOpacity>
         ) : item.message_type === 'gif' && item.media_url ? (
           <Image source={{ uri: item.media_url }} style={styles.mediaImage} resizeMode="contain" />
+        ) : isEph ? (
+          <EphemeralText content={cleanContent || ''} msgId={item.id} />
         ) : (
           <Text style={[styles.bubbleText, isMine && styles.bubbleTextMine]}>
-            {item.content}
+            {cleanContent}
           </Text>
         )}
       </AnimatedBubble>
@@ -334,6 +357,16 @@ export default function ChatScreen() {
 
       {/* ── Input Bar ─────────────────────────────────────── */}
       <BlurView intensity={60} tint="light" style={styles.inputBar}>
+        <TouchableOpacity
+          style={[styles.attachBtn, isEphemeral && { backgroundColor: Colors.orange }]}
+          onPress={() => {
+            setIsEphemeral(!isEphemeral);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
+        >
+          <AppIcon name="fire" size={18} color={isEphemeral ? '#fff' : Colors.labelSecondary} />
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.attachBtn}
           onPress={() => setShowAttach(!showAttach)}
@@ -493,6 +526,7 @@ const styles = StyleSheet.create({
   },
   bubbleTimeMine: { color: 'rgba(255,255,255,0.6)' },
   deletedText: { ...Typography.subheadline, color: Colors.labelTertiary, fontStyle: 'italic' },
+  ephemeralText: { fontStyle: 'italic', color: Colors.orange },
   mediaImage: { width: 220, height: 180, borderRadius: Radii.md },
   voiceRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 4 },
   voiceIcon: { fontSize: 18 },

@@ -19,6 +19,11 @@ import Animated, {
   FadeOut,
   FadeInUp,
   LinearTransition,
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withRepeat,
+  withTiming,
 } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -45,8 +50,12 @@ export default function DisguiseHomeScreen() {
   const [bannerIndex, setBannerIndex] = useState(0);
 
   // Shop store
-  const { addToCart, getCartCount, toggleWishlist, isInWishlist, profile } = useShopStore();
+  const { addToCart, getCartCount, toggleWishlist, isInWishlist, profile, products, fetchLiveProducts, isLoadingProducts } = useShopStore();
   const { isAuthenticated, user } = useAuthStore();
+
+  useEffect(() => {
+    fetchLiveProducts();
+  }, []);
 
   // ── Welcome Popup ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -137,8 +146,8 @@ export default function DisguiseHomeScreen() {
   };
 
   const filteredProducts = selectedCategory === '1'
-    ? FAKE_PRODUCTS
-    : FAKE_PRODUCTS.filter((p) => {
+    ? products
+    : products.filter((p) => {
         const cat = FAKE_CATEGORIES.find((c) => c.id === selectedCategory);
         return p.category === cat?.name;
       });
@@ -148,6 +157,13 @@ export default function DisguiseHomeScreen() {
     : filteredProducts;
 
   const cartCount = getCartCount();
+
+  // Skeleton Animation
+  const skeletonOpacity = useSharedValue(0.4);
+  useEffect(() => {
+    skeletonOpacity.value = withRepeat(withTiming(1, { duration: 800 }), -1, true);
+  }, []);
+  const skeletonStyle = useAnimatedStyle(() => ({ opacity: skeletonOpacity.value }));
 
   return (
     <View style={styles.container}>
@@ -287,70 +303,86 @@ export default function DisguiseHomeScreen() {
           {selectedCategory === '1' ? 'Featured Products' : FAKE_CATEGORIES.find((c) => c.id === selectedCategory)?.name}
         </Text>
         <View style={styles.productGrid}>
-          {searchFiltered.map((product, idx) => (
-            <Animated.View
-              key={product.id}
-              entering={FadeInUp.delay(idx * 60).springify().damping(18).stiffness(180)}
-            >
-              <TouchableOpacity
-                style={styles.productCard}
-                onPress={() => {
-                  resetInactivityTimer();
-                  handleRandomTap();
-                }}
-                activeOpacity={0.85}
-              >
-                <View style={styles.productImageWrapper}>
-                  <Image
-                    source={{ uri: product.imageUrl }}
-                    style={styles.productImage}
-                    resizeMode="cover"
-                  />
-                  {product.badge && (
-                    <View style={styles.productBadge}>
-                      <Text style={styles.productBadgeText}>{product.badge}</Text>
+          {isLoadingProducts ? (
+            Array.from({ length: 4 }).map((_, idx) => (
+              <Animated.View key={idx} style={[styles.productCard, skeletonStyle, { height: 260, backgroundColor: Colors.fillSecondary }]} />
+            ))
+          ) : (
+            searchFiltered.map((product, idx) => {
+              const scale = useSharedValue(1);
+              const animatedStyle = useAnimatedStyle(() => ({
+                transform: [{ scale: scale.value }]
+              }));
+
+              return (
+                <Animated.View
+                  key={product.id}
+                  entering={FadeInUp.delay(idx * 60).springify().damping(18).stiffness(180)}
+                  style={animatedStyle}
+                >
+                  <TouchableOpacity
+                    style={styles.productCard}
+                    onPressIn={() => { scale.value = withSpring(0.96); }}
+                    onPressOut={() => { scale.value = withSpring(1); }}
+                    onPress={() => {
+                      resetInactivityTimer();
+                      handleRandomTap();
+                    }}
+                    activeOpacity={0.95}
+                  >
+                    <View style={styles.productImageWrapper}>
+                      <Image
+                        source={{ uri: product.imageUrl }}
+                        style={styles.productImage}
+                        resizeMode="cover"
+                      />
+                      {product.badge && (
+                        <View style={styles.productBadge}>
+                          <Text style={styles.productBadgeText}>{product.badge}</Text>
+                        </View>
+                      )}
+                      <View style={styles.discountBadge}>
+                        <Text style={styles.discountText}>{Math.floor(Math.random() * 40) + 10}% OFF</Text>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.wishlistBtn}
+                        onPress={() => {
+                          toggleWishlist(product);
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                          resetInactivityTimer();
+                        }}
+                      >
+                        <AppIcon name={isInWishlist(product.id) ? 'heart-solid' : 'heart'} size={16} color={isInWishlist(product.id) ? Colors.red : Colors.labelSecondary} />
+                      </TouchableOpacity>
                     </View>
-                  )}
-                  <View style={styles.discountBadge}>
-                    <Text style={styles.discountText}>{product.discount}% OFF</Text>
-                  </View>
-                  <TouchableOpacity
-                    style={styles.wishlistBtn}
-                    onPress={() => {
-                      toggleWishlist(product);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      resetInactivityTimer();
-                    }}
-                  >
-                    <AppIcon name={isInWishlist(product.id) ? 'heart-solid' : 'heart'} size={16} color={isInWishlist(product.id) ? Colors.red : Colors.labelSecondary} />
+                    <View style={styles.productInfo}>
+                      <Text style={styles.productName} numberOfLines={2}>
+                        {product.name}
+                      </Text>
+                      <View style={styles.ratingRow}>
+                        <Text style={styles.ratingText}>⭐ {product.rating}</Text>
+                        <Text style={styles.reviewsText}>({Math.floor(Math.random() * 500) + 10})</Text>
+                      </View>
+                      <View style={styles.priceRow}>
+                        <Text style={styles.price}>₹{product.price.toLocaleString()}</Text>
+                        <Text style={styles.originalPrice}>₹{Math.floor(product.price * 1.3).toLocaleString()}</Text>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.addToCartBtn}
+                        onPress={() => {
+                          addToCart(product);
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                          resetInactivityTimer();
+                        }}
+                      >
+                        <Text style={styles.addToCartText}>Add to Cart</Text>
+                      </TouchableOpacity>
+                    </View>
                   </TouchableOpacity>
-                </View>
-                <View style={styles.productInfo}>
-                  <Text style={styles.productName} numberOfLines={2}>
-                    {product.name}
-                  </Text>
-                  <View style={styles.ratingRow}>
-                    <Text style={styles.ratingText}>⭐ {product.rating}</Text>
-                    <Text style={styles.reviewsText}>({product.reviews.toLocaleString()})</Text>
-                  </View>
-                  <View style={styles.priceRow}>
-                    <Text style={styles.price}>₹{product.price.toLocaleString()}</Text>
-                    <Text style={styles.originalPrice}>₹{product.originalPrice.toLocaleString()}</Text>
-                  </View>
-                  <TouchableOpacity
-                    style={styles.addToCartBtn}
-                    onPress={() => {
-                      addToCart(product);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      resetInactivityTimer();
-                    }}
-                  >
-                    <Text style={styles.addToCartText}>Add to Cart</Text>
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            </Animated.View>
-          ))}
+                </Animated.View>
+              );
+            })
+          )}
         </View>
 
         {/* ── Bottom padding ────────────────────────────────────── */}
