@@ -21,6 +21,11 @@ interface ShopState {
   wishlist: FakeProduct[];
   profile: ShopProfile;
   orders: FakeOrder[];
+  products: FakeProduct[];
+  isLoadingProducts: boolean;
+
+  // Product fetching
+  fetchLiveProducts: () => Promise<void>;
 
   // Cart actions
   addToCart: (product: FakeProduct) => void;
@@ -41,12 +46,36 @@ interface ShopState {
 export const useShopStore = create<ShopState>((set, get) => ({
   cart: [],
   wishlist: [],
+  products: [],
+  isLoadingProducts: false,
   profile: {
     name: 'Shopper',
     email: '',
     avatar: null,
   },
   orders: FAKE_ORDERS,
+
+  fetchLiveProducts: async () => {
+    set({ isLoadingProducts: true });
+    try {
+      const res = await fetch('https://fakestoreapi.com/products');
+      const data = await res.json();
+      const mapped: FakeProduct[] = data.map((item: any) => ({
+        id: item.id.toString(),
+        name: item.title,
+        description: item.description,
+        price: item.price * 80, // rough conversion to INR
+        imageUrl: item.image,
+        rating: item.rating?.rate || 4.5,
+      }));
+      set({ products: mapped, isLoadingProducts: false });
+    } catch (e) {
+      console.warn('Failed to fetch live products, falling back to dummy data', e);
+      // Fallback
+      const { FAKE_PRODUCTS } = require('@/constants/fakeData');
+      set({ products: FAKE_PRODUCTS, isLoadingProducts: false });
+    }
+  },
 
   addToCart: (product) =>
     set((s) => {

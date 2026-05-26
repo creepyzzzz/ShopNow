@@ -23,6 +23,28 @@ export default function SettingsScreen() {
   const [notifDisguise, setNotifDisguise] = useState(true);
   const [panicEnabled, setPanicEnabled] = useState(true);
   const [biometricVault, setBiometricVault] = useState(false);
+  const [duressPin, setDuressPin] = useState('');
+
+  React.useEffect(() => {
+    SecureStore.getItemAsync('duress_pin').then(pin => {
+      if (pin) setDuressPin(pin);
+      else setDuressPin('0000'); // default
+    });
+  }, []);
+
+  const handleSetDuressPin = () => {
+    Alert.prompt('Set Duress PIN', 'Enter a 4-digit PIN for the dummy vault.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Save', onPress: async (pin) => {
+        if (pin && pin.length >= 4) {
+          await SecureStore.setItemAsync('duress_pin', pin);
+          setDuressPin(pin);
+        } else {
+          Alert.alert('Invalid PIN', 'PIN must be at least 4 digits long.');
+        }
+      }}
+    ], 'secure-text');
+  };
 
   const handleSignOut = () => {
     Alert.alert('Sign Out', 'Sign out of StealthChat?', [
@@ -142,6 +164,22 @@ export default function SettingsScreen() {
               trackColor={{ true: Colors.blue }}
             />
           </View>
+          <View style={styles.divider} />
+
+          <TouchableOpacity style={styles.settingRow} onPress={handleSetDuressPin}>
+            <View style={styles.settingInfo}>
+              <View style={styles.settingIconWrap}>
+                <AppIcon name="shield-lock" size={20} color={Colors.label} />
+              </View>
+              <View>
+                <Text style={styles.settingTitle}>Duress PIN</Text>
+                <Text style={styles.settingDesc}>
+                  {duressPin ? 'Configured (Tap to change)' : 'Not configured'}
+                </Text>
+              </View>
+            </View>
+            <Text style={styles.chevron}>›</Text>
+          </TouchableOpacity>
           </View>
         </Animated.View>
 

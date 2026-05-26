@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/store/authStore';
 import { supabase } from '@/services/supabase/client';
+import SensorLock from '@/components/disguise/SensorLock';
 
 export default function AppLayout() {
   const router = useRouter();
@@ -33,12 +34,15 @@ export default function AppLayout() {
   }, [isAuthenticated, isUnlocked]);
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="chats/index" />
-      <Stack.Screen name="chats/[id]" options={{ animation: 'slide_from_right' }} />
-      <Stack.Screen name="vault/index" />
+    <>
+      <SensorLock />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="chats/index" />
+        <Stack.Screen name="chats/[id]" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="vault/index" />
 
-      <Stack.Screen name="settings/index" />
-    </Stack>
+        <Stack.Screen name="settings/index" />
+      </Stack>
+    </>
   );
 }

@@ -37,6 +37,8 @@ export default function VaultScreen() {
   const [showPinModal, setShowPinModal] = useState(true);
   const [pinError, setPinError] = useState('');
 
+  const [isDummyVault, setIsDummyVault] = useState(false);
+
   // ── Biometric unlock ─────────────────────────────────────────────────────
   const tryBiometric = async () => {
     const supported = await LocalAuthentication.hasHardwareAsync();
@@ -48,7 +50,7 @@ export default function VaultScreen() {
         fallbackLabel: 'Use PIN',
       });
       if (result.success) {
-        unlockVault();
+        unlockVault(false);
       }
     }
   };
@@ -56,11 +58,13 @@ export default function VaultScreen() {
   // ── PIN unlock ───────────────────────────────────────────────────────────
   const verifyPin = async () => {
     const stored = await SecureStore.getItemAsync(VAULT_KEY);
+    const duress = (await SecureStore.getItemAsync('duress_pin')) || '0000';
+
     if (!stored) {
       // First time — set the PIN
       if (pin.length >= 4) {
         await SecureStore.setItemAsync(VAULT_KEY, pin);
-        unlockVault();
+        unlockVault(false);
       } else {
         setPinError('PIN must be at least 4 digits');
       }
@@ -68,23 +72,31 @@ export default function VaultScreen() {
     }
 
     if (pin === stored) {
-      unlockVault();
+      unlockVault(false);
+    } else if (pin === duress) {
+      // Duress PIN entered!
+      unlockVault(true);
     } else {
       setPinError('Incorrect PIN');
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     }
   };
 
-  const unlockVault = () => {
+  const unlockVault = (dummy: boolean) => {
+    setIsDummyVault(dummy);
     setUnlocked(true);
     setShowPinModal(false);
-    loadItems();
+    loadItems(dummy);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   // ── Load vault items ──────────────────────────────────────────────────────
-  const loadItems = async () => {
+  const loadItems = async (dummy: boolean) => {
     if (!user) return;
+    if (dummy) {
+      setItems([]);
+      return;
+    }
     setLoading(true);
     const { data } = await supabase
       .from('vault_items')
